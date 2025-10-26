@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test HTTP Methods</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        body {
+            background-color: #3f31a3;
+            color: white;
+        }
+        .method-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #2c2177;
+            border: 1px solid #5a4cbb;
+            border-radius: 5px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        h1, h2 {
+            color: white;
+            border-bottom: 1px solid #5a4cbb;
+            padding-bottom: 10px;
+        }
+        form {
+            margin-top: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: white;
+        }
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            background-color: #322984;
+            color: white;
+            border: 1px solid #5a4cbb;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #5a4cbb;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #4a3da9;
+        }
+        a {
+            color: #8be9fd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test HTTP Methods</h1>
+        
+        <div class="method-section">
+            <h2>GET Request</h2>
+            <p>Test a simple GET request with query parameters</p>
+            <form action="/cgi-bin/test_get.py" method="get">
+                <label for="test_param">Parameter:</label>
+                <input type="text" id="test_param" name="test_param" value="hello_world">
+                
+                <label for="user">User:</label>
+                <input type="text" id="user" name="user" value="testuser">
+                
+                <button type="submit">Send GET Request</button>
+            </form>
+        </div>
+        
+        <div class="method-section">
+            <h2>POST Request</h2>
+            <p>Test a POST request with form data</p>
+            
+            <div class="post-options">
+                <h3>Option 1: Form Submission</h3>
+                <form action="/cgi-bin/test_post.py" method="post">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" value="Test User">
+                    
+                    <label for="email">Email:</label>
+                    <input type="text" id="email" name="email" value="test@example.com">
+                    
+                    <label for="message">Message:</label>
+                    <input type="text" id="message" name="message" value="This is a test message">
+                    
+                    <button type="submit">Submit Form</button>
+                </form>
+                
+                <h3>Option 2: File Upload</h3>
+                <form action="/cgi-bin/upload.py" method="post" enctype="multipart/form-data">
+                    <label for="filename">Upload File:</label>
+                    <input type="file" id="filename" name="filename">
+                    
+                    <button type="submit">Upload File</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="method-section">
+            <h2>DELETE Method</h2>
+            <p>Test a DELETE request to remove files from the server.</p>
+            <div id="deleteSection">
+                <h3>Available Files:</h3>
+                <div id="fileList">Loading files...</div>
+                
+                <script>
+                    function loadFiles() {
+                        const fileList = document.getElementById('fileList');
+                        fetch('/cgi-bin/test_delete.py')
+                            .then(response => response.text())
+                            .then(html => {
+                                const parser = new DOMParser();
+                                const doc = parser.parseFromString(html, 'text/html');
+                                const fileListItems = doc.querySelectorAll('ul li');
+                                if (fileListItems.length === 0) {
+                                    fileList.innerHTML = '<p>No files found in the tmp directory.</p>';
+                                    return;
+                                }
+                                let listHTML = '<ul>';
+                                fileListItems.forEach(item => {
+                                    const fileName = item.textContent.split(' ')[0];
+                                    listHTML += `<li>${item.textContent} <button onclick="deleteFile('${fileName}')" class="delete-btn">Delete</button></li>`;
+                                });
+                                listHTML += '</ul>';
+                                fileList.innerHTML = listHTML;
+                            })
+                            .catch(error => {
+                                fileList.innerHTML = `<p class="error">Error loading files: ${error}</p>`;
+                            });
+                    }
+
+                    function deleteFile(fileName) {
+                        if (confirm(`Are you sure you want to delete ${fileName}?`)) {
+                            fetch(`/cgi-bin/test_delete.py?file=${fileName}`, {
+                                method: 'DELETE'
+                            })
+                            .then(response => response.text())
+                            .then(() => {
+                                alert(`File ${fileName} deletion request sent.`);
+                                loadFiles();
+                            })
+                            .catch(error => {
+                                alert(`Error: ${error}`);
+                            });
+                        }
+                    }
+
+                    // Load files when page loads
+                    window.onload = loadFiles;
+                </script>
+            </div>
+        </div>
+        
+        <p><a href="/index.html">Return to Home Page</a></p>
+    </div>
+</body>
+</html>

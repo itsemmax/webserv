@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webserv Test Server</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 Webserv Test Server</h1>
+        <p>Welcome to the Webserv test page. Use the forms below to test various server functionalities.</p>
+        
+        <div class="test-section">
+            <h2>📝 GET Method Tests</h2>
+            
+            <h3>Simple GET Request</h3>
+            <form method="GET" action="/cgi-bin/test_get.py">
+                <div class="form-group">
+                    <label>Test Param:</label>
+                    <input type="text" name="test_param" value="hello_world">
+                </div>
+                <div class="form-group">
+                    <label>Username:</label>
+                    <input type="text" name="user" value="testuser">
+                </div>
+                <button type="submit" class="btn">Send GET Request</button>
+            </form>
+
+            <h3>Environment Variables</h3>
+            <a href="/cgi-bin/env.py" class="btn">View Environment</a>
+            <a href="/cgi-bin/time.py" class="btn">Current Time</a>
+            <a href="/cgi-bin/show_config.py" class="btn">Server Config</a>
+        </div>
+
+        <div class="test-section">
+            <h2>❌ DELETE Method Tests</h2>
+            
+            <h3>File Management</h3>
+            <a href="/file_management.html" class="btn">Manage Files</a>
+            <p>View and delete files from the server.</p>
+        </div>
+
+        <div class="test-section">
+            <h2>📤 POST Method Tests</h2>
+            
+            <h3>Simple POST Request</h3>
+            <form method="POST" action="/cgi-bin/test_post.py">
+                <div class="form-group">
+                    <label>Name:</label>
+                    <input type="text" name="name" value="John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" name="email" value="john@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Message:</label>
+                    <textarea name="message" rows="3">Hello from POST request! This is a test message.</textarea>
+                </div>
+                <input type="hidden" name="hidden_field" value="secret_value">
+                <button type="submit" class="btn">Send POST Request</button>
+            </form>
+
+            <h3>File Upload Test</h3>
+            <form enctype="multipart/form-data" method="POST" action="/cgi-bin/upload.py">
+                <div class="form-group">
+                    <label>Select File:</label>
+                    <input type="file" name="filename" accept="*/*">
+                </div>
+                <div class="form-group">
+                    <label>Description:</label>
+                    <input type="text" name="description" value="Test file upload">
+                </div>
+                <button type="submit" class="btn">Upload File</button>
+            </form>
+        </div>
+
+        <div class="test-section">
+            <h2> Server Status</h2>
+            <p>Server is running on port 8002</p>
+            <p>Document root: www/</p>
+            <p>CGI enabled: Python scripts (.py)</p>
+        </div>
+    </div>
+</body>
+</html>
