@@ -10,49 +10,6 @@ ConfigParser::~ConfigParser() { }
 /* printing parametrs of servers from config file */
 int ConfigParser::print()
 {
-	std::cout << "------------- Config -------------" << std::endl;
-	for (size_t i = 0; i < _servers.size(); i++)
-	{
-		std::cout << "Server #" << i + 1 << std::endl;
-		std::cout << "Server name: " << _servers[i].getServerName() << std::endl;
-		std::cout << "Host: " << _servers[i].getHost() << std::endl;
-		std::cout << "Root: " << _servers[i].getRoot() << std::endl;
-		std::cout << "Index: " << _servers[i].getIndex() << std::endl;
-		std::cout << "Port: " << _servers[i].getPort() << std::endl;
-		std::cout << "Max BSize: " << _servers[i].getClientMaxBodySize() << std::endl;
-		std::cout << "Error pages: " << _servers[i].getErrorPages().size() << std::endl;
-		std::map<short, std::string>::const_iterator it = _servers[i].getErrorPages().begin();
-		while (it != _servers[i].getErrorPages().end())
-		{
-			std::cout << (*it).first << " - " << it->second << std::endl;
-			++it;
-		}
-		std::cout << "Locations: " << _servers[i].getLocations().size() << std::endl;
-		std::vector<Location>::const_iterator itl = _servers[i].getLocations().begin();
-		while (itl != _servers[i].getLocations().end())
-		{
-			std::cout << "name location: " << itl->getPath() << std::endl;
-			std::cout << "methods: " << itl->getPrintMethods() << std::endl;
-			std::cout << "index: " << itl->getIndexLocation() << std::endl;
-			if (itl->getCgiPath().empty())
-			{
-				std::cout << "root: " << itl->getRootLocation() << std::endl;
-				if (!itl->getReturn().empty())
-					std::cout << "return: " << itl->getReturn() << std::endl;
-				if (!itl->getAlias().empty())
-					std::cout << "alias: " << itl->getAlias() << std::endl;
-			}
-			else
-			{
-				std::cout << "cgi root: " << itl->getRootLocation() << std::endl;
-				std::cout << "sgi_path: " << itl->getCgiPath().size() << std::endl;
-				std::cout << "sgi_ext: " << itl->getCgiExtension().size() << std::endl;
-			}
-			++itl;
-		}
-		itl = _servers[i].getLocations().begin();
-		std::cout << "-----------------------------" << std::endl;
-	}
 	return (0);
 }
 

@@ -122,7 +122,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 else
                 {
                     _error_code = 501;
-                    std::cout << "Method Error Request_Line and Character is = " << character << std::endl;
                     return ;
                 }
                 _state = Request_Line_Method;
@@ -137,7 +136,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 else
                 {
                     _error_code = 501;
-                    std::cout << "Method Error Request_Line and Character is = " << character << std::endl;
                     return ;
                 }
                 _method_index++;
@@ -151,7 +149,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 else
                 {
                     _error_code = 501;
-                    std::cout << "Method Error Request_Line and Character is = " << character << std::endl;
                     return ;
                 }
 
@@ -164,7 +161,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 if (character != ' ')
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Request_Line_First_Space)" << std::endl;
                     return ;
                 }
                 _state = Request_Line_URI_Path_Slash;
@@ -180,7 +176,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 else
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Request_Line_URI_Path_Slash)" << std::endl;
                     return ;
                 }
                 break ;
@@ -211,13 +206,11 @@ void    HttpRequest::feed(char *data, size_t size)
                 else if (!allowedCharURI(character))
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Request_Line_URI_Path)" << std::endl;
                     return ;
                 }
                 else if ( i > MAX_URI_LENGTH)
                 {
                     _error_code = 414;
-                    std::cout << "URI Too Long (Request_Line_URI_Path)" << std::endl;
                     return ;
                 }
                 break ;
@@ -241,13 +234,11 @@ void    HttpRequest::feed(char *data, size_t size)
                 else if (!allowedCharURI(character))
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Request_Line_URI_Query)" << std::endl;
                     return ;
                 }
                 else if ( i > MAX_URI_LENGTH)
                 {
                     _error_code = 414;
-                    std::cout << "URI Too Long (Request_Line_URI_Path)" << std::endl;
                     return ;
                 }
                 break ;
@@ -264,13 +255,11 @@ void    HttpRequest::feed(char *data, size_t size)
                 else if (!allowedCharURI(character))
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Request_Line_URI_Fragment)" << std::endl;
                     return ;
                 }
                 else if ( i > MAX_URI_LENGTH)
                 {
                     _error_code = 414;
-                    std::cout << "URI Too Long (Request_Line_URI_Path)" << std::endl;
                     return ;
                 }
                 break ;
@@ -280,13 +269,11 @@ void    HttpRequest::feed(char *data, size_t size)
                 if (checkUriPos(_path))
                 {
                     _error_code = 400;
-                    std::cout << "Request URI ERROR: goes before root !!" << std::endl;
                     return ;
                 }
                 if (character != 'H')
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Request_Line_Ver)" << std::endl;
                     return ;
                 }
                 _state = Request_Line_HT;
@@ -297,7 +284,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 if (character != 'T')
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Request_Line_HT)" << std::endl;
                     return ;
                 }
                 _state = Request_Line_HTT;
@@ -308,7 +294,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 if (character != 'T')
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Request_Line_HTT)" << std::endl;
                     return ;
                 }
                 _state = Request_Line_HTTP;
@@ -319,7 +304,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 if (character != 'P')
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Request_Line_HTTP)" << std::endl;
                     return ;
                 }
                 _state = Request_Line_HTTP_Slash;
@@ -330,7 +314,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 if (character != '/')
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Request_Line_HTTP_Slash)" << std::endl;
                     return ;
                 }
                 _state = Request_Line_Major;
@@ -341,7 +324,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 if (!isdigit(character))
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Request_Line_Major)" << std::endl;
                     return ;
                 }
                 _ver_major = character;
@@ -354,7 +336,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 if (character != '.')
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Request_Line_Dot)" << std::endl;
                     return ;
                 }
                 _state = Request_Line_Minor;
@@ -365,7 +346,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 if (!isdigit(character))
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Request_Line_Minor)" << std::endl;
                     return ;
                 }
                 _ver_minor = character;
@@ -377,7 +357,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 if (character != '\r')
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Request_Line_CR)" << std::endl;
                     return ;
                 }
                 _state = Request_Line_LF;
@@ -388,7 +367,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 if (character != '\n')
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Request_Line_LF)" << std::endl;
                     return ;
                 }
                 _state = Field_Name_Start;
@@ -404,7 +382,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 else
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Field_Name_Start)" << std::endl;
                     return ;
                 }
                 break ;
@@ -435,7 +412,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 else
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Fields_End)" << std::endl;
                     return ;
                 }
                 break ;
@@ -452,7 +428,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 else if (!isToken(character))
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Field_Name)" << std::endl;
                     return ;
                 }
                 break ;
@@ -481,7 +456,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 else
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Field_Value_End)" << std::endl;
                     return ;
                 }
                 break ;
@@ -491,7 +465,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 if (isxdigit(character) == 0)
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Chunked_Length_Begin)" << std::endl;
                     return ;
                 }
                 s.str("");
@@ -529,7 +502,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 else
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Chunked_Length_CR)" << std::endl;
                     return ;
                 }
                 continue ;
@@ -546,7 +518,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 else
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Chunked_Length_LF)" << std::endl;
                     return ;
                 }
                 continue ;
@@ -572,7 +543,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 else
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Chunked_Data_CR)" << std::endl;
                     return ;
                 }
                 continue ;
@@ -584,7 +554,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 else
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Chunked_Data_LF)" << std::endl;
                     return ;
                 }
                 continue ;
@@ -594,7 +563,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 if (character != '\r')
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Chunked_End_CR)" << std::endl;
                     return ;
                 }
                 _state = Chunked_End_LF;
@@ -606,7 +574,6 @@ void    HttpRequest::feed(char *data, size_t size)
                 if (character != '\n')
                 {
                     _error_code = 400;
-                    std::cout << "Bad Character (Chunked_End_LF)" << std::endl;
                     return ;
                 }
                 _body_done_flag = true;
@@ -724,22 +691,6 @@ void    HttpRequest::setMaxBodySize(size_t size)
 
 void        HttpRequest::printMessage()
 {
-    std::cout << _method_str[_method] + " " + _path + "?" + _query + "#" + _fragment
-              + " " + "HTTP/" << _ver_major  << "." << _ver_minor << std::endl;
-
-    for (std::map<std::string, std::string>::iterator it = _request_headers.begin();
-    it != _request_headers.end(); ++it)
-    {
-        std::cout << it->first + ":" + it->second << std::endl;
-    }
-    for (std::vector<u_int8_t>::iterator it = _body.begin(); it != _body.end(); ++it)
-    {
-        std::cout << *it;
-    }
-    std::cout << std::endl << "END OF BODY" << std::endl;
-
-    std::cout << "BODY FLAG =" << _body_flag << "  _BOD_done_flag= " << _body_done_flag << "FEIDLS FLAG = " << _fields_done_flag
-    << std::endl;
 }
 
 

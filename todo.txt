@@ -1,0 +1,3 @@
+i should date ./webserv [config file] it should work only with a config file and not with with default when m not use in it 
+remove all the extra files and debuging lines and extra lines that i didn't work with 
+i should add config files that are work with multiple ports  

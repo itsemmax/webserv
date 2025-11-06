@@ -359,7 +359,6 @@ int    Response::handleTarget()
 
         if (isAllowedMethod(request.getMethod(), target_location, _code))
         {
-            std::cout << "METHOD NOT ALLOWED \n";
             return (1);
         }
         if (request.getBody().length() > target_location.getMaxBodySize())

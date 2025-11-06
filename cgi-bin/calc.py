@@ -1,5 +1,8 @@
 #! /usr/bin/python3
 
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
 import cgi
 import sys
 import os

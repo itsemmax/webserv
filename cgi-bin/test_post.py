@@ -1,29 +1,18 @@
 #!/usr/bin/env python3
 
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
 import os
 import sys
-import urllib.parse
+import cgi
 
 # Print the HTTP headers
 print("HTTP/1.1 200 OK")
 print("Content-type: text/html\r\n\r\n")
 
 # Initialize variables
-form_data = {}
-
-# Read POST data from stdin
-try:
-    content_length = int(os.environ.get('CONTENT_LENGTH', 0))
-    if content_length > 0:
-        post_data = sys.stdin.read(content_length)
-        # Parse URL-encoded data
-        for pair in post_data.split('&'):
-            if '=' in pair:
-                key, value = pair.split('=', 1)
-                form_data[urllib.parse.unquote_plus(key)] = urllib.parse.unquote_plus(value)
-except:
-    pass
-
+form = cgi.FieldStorage()
 message = ""
 
 # Print HTML content
@@ -47,15 +36,15 @@ print("<h1>POST Method Test</h1>")
 print("<p>This script demonstrates processing data sent via POST method.</p>")
 
 # Check if the form has been submitted
-if len(form_data) > 0:
+if len(form) > 0:
     print("<h2>Form Data Received:</h2>")
     print("<div class='form-data'>")
     print("<table>")
     print("<tr><th>Field Name</th><th>Value</th></tr>")
     
     # Display all form fields
-    for field, value in form_data.items():
-        print(f"<tr><td>{field}</td><td>{value}</td></tr>")
+    for field in form.keys():
+        print(f"<tr><td>{field}</td><td>{form.getvalue(field)}</td></tr>")
     print("</table>")
     print("</div>")
 else:

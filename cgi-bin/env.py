@@ -1,6 +1,10 @@
 #!/usr/bin/python3
 
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
 import os
+import cgi
 
 print("HTTP/1.1 200 OK")
 print("Content-type: text/html\r\n\r\n")

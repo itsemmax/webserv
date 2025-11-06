@@ -1,6 +1,9 @@
 #!/usr/bin/python3
 
-import os
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+import cgi, os
 import sys
 
 # Print the HTTP headers
@@ -8,51 +11,30 @@ print("HTTP/1.1 200 OK")
 print("Content-Type: text/html;charset=utf-8\r\n\r\n")
 
 try:
+    form = cgi.FieldStorage()
+    
     # Create the tmp directory if it doesn't exist
     tmp_dir = os.path.join(os.getcwd(), 'cgi-bin', 'tmp')
     if not os.path.exists(tmp_dir):
         os.makedirs(tmp_dir)
     
-    # Read multipart form data manually
-    content_length = int(os.environ.get('CONTENT_LENGTH', 0))
-    if content_length > 0:
-        # Read the entire body
-        body = sys.stdin.buffer.read(content_length)
-        
-        # Simple multipart parsing - extract filename and content
-        body_str = body.decode('utf-8', errors='ignore')
-        
-        # Look for filename in Content-Disposition
-        if 'filename="' in body_str:
-            # Extract filename
-            start = body_str.find('filename="') + 10
-            end = body_str.find('"', start)
-            filename = body_str[start:end]
-            
-            if filename:
-                # Find the actual file content (after double CRLF)
-                content_start = body.find(b'\r\n\r\n') + 4
-                # Find the boundary end marker
-                boundary_end = body.rfind(b'\r\n--')
-                
-                if content_start > 3 and boundary_end > content_start:
-                    file_content = body[content_start:boundary_end]
-                    
-                    safe_filename = os.path.basename(filename)
-                    save_path = os.path.join(tmp_dir, safe_filename)
-                    
-                    with open(save_path, 'wb') as f:
-                        f.write(file_content)
-                    
-                    message = 'The file "' + safe_filename + '" was successfully uploaded to ' + tmp_dir
-                else:
-                    message = 'Uploading Failed: Could not parse file content'
-            else:
-                message = 'Uploading Failed: No filename provided'
-        else:
-            message = 'Error: No file uploaded (missing "filename" field)'
+    # Get filename here
+    if 'filename' not in form:
+        message = 'Error: No file uploaded (missing "filename" field)'
     else:
-        message = 'Error: No file data received'
+        fileitem = form['filename']
+        
+        # Test if the file was uploaded
+        if fileitem.filename:
+            safe_filename = os.path.basename(fileitem.filename)
+            save_path = os.path.join(tmp_dir, safe_filename)
+            
+            with open(save_path, 'wb') as f:
+                f.write(fileitem.file.read())
+            
+            message = 'The file "' + safe_filename + '" was successfully uploaded to ' + tmp_dir
+        else:
+            message = 'Uploading Failed: No file selected'
 except Exception as e:
     message = f'Error during file upload: {str(e)}'
 
