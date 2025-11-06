@@ -5,18 +5,13 @@
 #include "HttpRequest.hpp"
 #include "Response.hpp"
 
-/**
-     Client
-   - Stores all information related to the client such as socket and address
-     along with request and response objects. each Client also have an object of the server it's conntected to.
-**/
 class Client
 {
     public:
         Client();
         Client(const Client &other);
         Client(ServerConfig &);
-		    Client &operator=(const Client & rhs);
+        Client &operator=(const Client & rhs);
         ~Client();
 
         const int                 &getSocket() const;
@@ -39,6 +34,5 @@ class Client
         struct sockaddr_in  _client_address;
         time_t              _last_msg_time;
 };
-
 
 #endif // CLIENT_HPP

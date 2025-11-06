@@ -47,15 +47,6 @@ bool    checkUriPos(std::string path)
     return (0);
 }
 
-/**
-
- * Checks if character is allowed to be in a URI
- * Characters allowed as specifed in RFC:
-   Alphanumeric: A-Z a-z 0-9
-   Unreserved: - _ . ~
-   Reserved:  * ' ( ) ; : @ & = + $ , / ? % # [ ]
-
- **/
 bool    allowedCharURI(uint8_t ch)
 {
     if ((ch >= '#' && ch <= ';') || (ch >= '?' && ch <= '[') || (ch >= 'a' && ch <= 'z') ||
@@ -64,16 +55,6 @@ bool    allowedCharURI(uint8_t ch)
     return (false);
 }
 
-/**
-
-* Checks whether the character passed is allowed in a field name
-* Characters allowed as specifed in RFC:
-
-"!" / "#" / "$" / "%" / "&" / "'"
-/ "*" / "+" / "-" / "." / "^" / "_"
-/ "`" / "|" / "~" / 0-9 / A-Z / a-z
-
-**/
 bool    isToken(uint8_t ch)
 {
     if (ch == '!' || (ch >= '#' && ch <= '\'') || ch == '*'|| ch == '+' || ch == '-'  || ch == '.' ||
@@ -83,7 +64,6 @@ bool    isToken(uint8_t ch)
     return (false);
 }
 
-/* Trim leading and trailing  spaces */
 void    trimStr(std::string &str)
 {
     static const char* spaces = " \t";
@@ -96,6 +76,7 @@ void    toLower(std::string &str)
     for (size_t i = 0; i < str.length(); ++i)
         str[i] = std::tolower(str[i]);
 }
+
 void    HttpRequest::feed(char *data, size_t size)
 {
     u_int8_t character;
@@ -393,7 +374,6 @@ void    HttpRequest::feed(char *data, size_t size)
                     _storage.clear();
                     _fields_done_flag = true;
                     _handle_headers();
-                    //if no body then parsing is completed.
                     if (_body_flag == 1)
                     {
                         if (_chunked_flag == true)
@@ -431,8 +411,6 @@ void    HttpRequest::feed(char *data, size_t size)
                     return ;
                 }
                 break ;
-                //if (!character allowed)
-                // error;
             }
             case Field_Value:
             {
@@ -688,11 +666,9 @@ void    HttpRequest::setMaxBodySize(size_t size)
     _max_body_size = size;
 }
 
-
 void        HttpRequest::printMessage()
 {
 }
-
 
 void        HttpRequest::_handle_headers()
 {
@@ -729,8 +705,6 @@ short     HttpRequest::errorCode()
     return (this->_error_code);
 }
 
-/* Reset object variables to recive new request */
-
 void    HttpRequest::clear()
 {
     _path.clear();
@@ -756,8 +730,6 @@ void    HttpRequest::clear()
     _chunked_flag = false;
     _multiform_flag = false;
 }
-
-/* Checks the value of header "Connection". If keep-alive, don't close the connection. */
 
 bool        HttpRequest::keepAlive()
 {

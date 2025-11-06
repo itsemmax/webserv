@@ -1,6 +1,5 @@
 #include "../inc/Mime.hpp"
 
-
 Mime::Mime()
 {
     _mime_types[".html"] = "text/html";

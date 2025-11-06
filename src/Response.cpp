@@ -76,9 +76,8 @@ void    Response::date()
     _response_content.append("Date: ");
     _response_content.append(date);
     _response_content.append("\r\n");
-
 }
-// uri ecnoding
+
 void    Response::setHeaders()
 {
     contentType();
@@ -109,14 +108,12 @@ static bool isAllowedMethod(HttpMethod &method, Location &location, short &code)
 {
     std::vector<short> methods = location.getMethods();
     
-    // Check if the method is implemented
     if (method == NONE)
     {
-        code = 501; // Not Implemented
+        code = 501;
         return (1);
     }
     
-    // Check if the method is allowed in this location
     bool allowed = false;
     switch(method)
     {
@@ -136,13 +133,13 @@ static bool isAllowedMethod(HttpMethod &method, Location &location, short &code)
             allowed = methods[4];
             break;
         default:
-            code = 501; // Not Implemented
+            code = 501;
             return (1);
     }
     
     if (!allowed)
     {
-        code = 405; // Method Not Allowed
+        code = 405;
         return (1);
     }
     return (0);
@@ -168,20 +165,17 @@ static std::string combinePaths(std::string p1, std::string p2, std::string p3)
     int         len1;
     int         len2;
 
-    // Remove leading slash from p1 if it exists
     if (!p1.empty() && p1[0] == '/')
         p1.erase(0, 1);
         
     len1 = p1.length();
     len2 = p2.length();
     
-    // Handle slashes between p1 and p2
     if (p1[len1 - 1] == '/' && (!p2.empty() && p2[0] == '/'))
         p2.erase(0, 1);
     if (p1[len1 - 1] != '/' && (!p2.empty() && p2[0] != '/'))
         p1.insert(p1.end(), '/');
         
-    // Handle slashes between p2 and p3
     if (p2[len2 - 1] == '/' && (!p3.empty() && p3[0] == '/'))
         p3.erase(0, 1);
     if (p2[len2 - 1] != '/' && (!p3.empty() && p3[0] != '/'))
@@ -198,80 +192,53 @@ static void replaceAlias(Location &location, HttpRequest &request, std::string &
 
 static void appendRoot(Location &location, HttpRequest &request, std::string &target_file)
 {
-    // Get the root path from location or use www as default
     std::string rootPath = location.getRootLocation();
     if (rootPath.empty()) {
-        rootPath = "./www";  // Default root path with ./ prefix
+        rootPath = "./www";
     }
     
-    // Ensure root path starts with ./
     if (rootPath.substr(0, 2) != "./") {
         rootPath = "./" + rootPath;
     }
     
-    // Remove trailing slash if present
     if (rootPath[rootPath.length() - 1] == '/') {
         rootPath = rootPath.substr(0, rootPath.length() - 1);
     }
     
-    // For root path ("/"), append index file
     if (request.getPath() == "/" || request.getPath().empty()) {
         target_file = rootPath;
         if (target_file[target_file.length() - 1] != '/') {
             target_file += "/";
         }
         
-        // Try location's index first, then server's default index
         std::string idx = location.getIndexLocation();
         if (idx.empty()) {
             idx = "index.html";
         }
         target_file += idx;
     } else {
-        // For other paths, combine root with request path
         std::string path = request.getPath();
         if (path[0] == '/') {
-            path = path.substr(1); // Remove leading slash
+            path = path.substr(1);
         }
         target_file = rootPath + "/" + path;
     }
     
 }
 
-int Response::handleCgiTemp(std::string &location_key)
-{
-    std::string path;
-    path = _target_file;
-    _cgi_obj.clear();
-    _cgi_obj.setCgiPath(path);
-    _cgi = 1;
-    if (pipe(_cgi_fd) < 0)
-    {
-        _code = 500;
-        return (1);
-    }
-    _cgi_obj.initEnvCgi(request, _server.getLocationKey(location_key)); // + URI
-    _cgi_obj.execute(this->_code);
-    return (0);
-}
-
-/* check a file for CGI (the extension is supported, the file exists and is executable) and run the CGI */
 int Response::handleCgi(std::string &location_key)
 {
     std::string path;
     std::string exten;
     size_t      pos;
 
-    // Use the target file that was set in handleTarget
     path = _target_file;
 
-    // Handle default index for /cgi-bin/
     if (path == "cgi-bin" || path == "cgi-bin/")
     {
         path = "cgi-bin/" + _server.getLocationKey(location_key)->getIndexLocation();
     }
 
-    // Check file extension
     pos = path.find(".");
     if (pos == std::string::npos)
     {
@@ -281,14 +248,12 @@ int Response::handleCgi(std::string &location_key)
 
     exten = path.substr(pos);
 
-    // Verify extension is supported
     if (exten != ".py" && exten != ".sh")
     {
         _code = 501;
         return (1);
     }
 
-    // Check if file exists and is accessible
     struct stat st;
     if (stat(path.c_str(), &st) != 0)
     {
@@ -296,39 +261,30 @@ int Response::handleCgi(std::string &location_key)
         return (1);
     }
 
-    // Check if file is executable
     if (!(st.st_mode & S_IXUSR))
     {
         _code = 403;
         return (1);
     }
 
-    // Check if method is allowed
     if (isAllowedMethod(request.getMethod(), *_server.getLocationKey(location_key), _code))
     {
         return (1);
     }
 
-    // Setup CGI execution
     _cgi_obj.clear();
     _cgi_obj.setCgiPath(path);
     _cgi = 1;
 
-    // Create pipe for CGI communication
     if (pipe(_cgi_fd) < 0)
     {
         _code = 500;
         return (1);
     }
-    _cgi_obj.initEnv(request, _server.getLocationKey(location_key)); // + URI
+    _cgi_obj.initEnv(request, _server.getLocationKey(location_key));
     _cgi_obj.execute(this->_code);
     return (0);
 }
-
-/*
-    Compares URI with locations from config file and tries to find the best match.
-    If match found, then location_key is set to that location, otherwise location_key will be an empty string.
-*/
 
 static void    getLocationMatch(std::string &path, std::vector<Location> locations, std::string &location_key)
 {
@@ -390,7 +346,7 @@ int    Response::handleTarget()
 
             if (_target_file.rfind(target_location.getCgiExtension()[0]) != std::string::npos)
             {
-                return (handleCgiTemp(location_key));
+                return (handleCgi(location_key));
             }
 
         }
@@ -436,7 +392,6 @@ int    Response::handleTarget()
     }
     else
     {
-        // Handle root path specially
         if (request.getPath() == "/" || request.getPath().empty()) {
             _target_file = combinePaths(_server.getRoot(), "", "");
             if (_target_file[_target_file.length() - 1] != '/') {
@@ -464,7 +419,7 @@ int    Response::handleTarget()
             _target_file += _server.getIndex();
             if (!fileExists(_target_file))
             {
-                _code = 404;  // Changed from 403 to 404 for consistency
+                _code = 404;
                 return (1);
             }
             if (isDirectory(_target_file))
@@ -504,14 +459,12 @@ void Response::buildErrorBody()
     }
     else
     {
-        // Directly serve the error page instead of redirecting
         std::string error_page = _server.getErrorPages().at(_code);
         if (error_page[0] != '/')
             error_page.insert(error_page.begin(), '/');
 
         _target_file = _server.getRoot() + error_page;
 
-        // If error page doesn't exist, fall back to default
         if (!fileExists(_target_file)) {
             setServerDefaultErrorPages();
         }
@@ -567,19 +520,16 @@ void Response::setErrorResponse(short code)
     _response_content.append(_response_body);
 }
 
-/* Returns the entire reponse ( Headers + Body )*/
 std::string Response::getRes()
 {
     return (_response_content);
 }
 
-/* Returns the length of entire reponse ( Headers + Body) */
 size_t Response::getLen() const
 {
 	return (_response_content.length());
 }
 
-/* Constructs Status line based on status code. */
 void        Response::setStatusLine()
 {
     _response_content.append("HTTP/1.1 " + toString(_code) + " ");
@@ -648,7 +598,6 @@ int    Response::buildBody()
         return (0);
     }
     
-    // Method not implemented
     _code = 405;
     return (1);
 }
@@ -656,7 +605,6 @@ int    Response::buildBody()
 int Response::readFile()
 {
 
-    // First check if path exists
     struct stat path_stat;
     if (stat(_target_file.c_str(), &path_stat) != 0)
     {
@@ -664,14 +612,12 @@ int Response::readFile()
         return (1);
     }
 
-    // Check if it's a regular file
     if (!S_ISREG(path_stat.st_mode))
     {
         _code = 403;
         return (1);
     }
 
-    // Try to open and read the file
     std::ifstream file(_target_file.c_str(), std::ios::binary);
     if (!file.is_open())
     {
@@ -679,7 +625,6 @@ int Response::readFile()
         return (1);
     }
 
-    // Read file content
     try {
         std::ostringstream ss;
         ss << file.rdbuf();

@@ -53,7 +53,6 @@ Location &Location::operator=(const Location &rhs)
 
 Location::~Location() { }
 
-/* set functions */
 void Location::setPath(std::string parametr)
 {
 	this->_path = parametr;
@@ -144,7 +143,6 @@ void Location::setMaxBodySize(unsigned long parametr)
 	this->_client_max_body_size = parametr;
 }
 
-/* get functions */
 const std::string &Location::getPath() const
 {
 	return (this->_path);
@@ -200,7 +198,6 @@ const unsigned long &Location::getMaxBodySize() const
 	return (this->_client_max_body_size);
 }
 
-/* for printing allowed methods*/
 std::string Location::getPrintMethods() const
 {
 	std::string res;

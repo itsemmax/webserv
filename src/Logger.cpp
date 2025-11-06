@@ -1,12 +1,10 @@
 #include "../inc/Logger.hpp"
 
-
 std::string Logger::file_name = "logfile.txt";
 LogPrio Logger::prio = ERROR;
 L_State Logger::state = ON;
 
 std::map<LogPrio, std::string> Logger::prio_str = initMap();
-
 
 std::map<LogPrio, std::string> Logger::initMap()
 {
@@ -45,10 +43,6 @@ void    Logger::logMsg(const char *color, Mode m, const char* msg, ...)
         }
         else if (m == CONSOLE_OUTPUT)
         {
-            // Not used Currently..
-            // if (p == DEBUG)
-            // else if (p == INFO)
-            // else if (p == ERROR)
             std::cout << color << getCurrTime() << output << RESET << std::endl;
         }      
         va_end(args);
@@ -80,5 +74,4 @@ void Logger::setState(L_State s)
 {
     Logger::state = s;
 }
-
 

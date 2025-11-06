@@ -4,11 +4,6 @@
 # include "Webserv.hpp"
 # include "HttpRequest.hpp"
 
-
-/*
-    Responsible for building and storing the response. when response is ready, 
-    it will be stored on _response_content and can be used by func getRes().
-*/
 class Response
 {
     public:
@@ -68,7 +63,6 @@ class Response
         void    buildErrorBody();
         bool    reqError();
         int     handleCgi(std::string &);
-        int     handleCgiTemp(std::string &);
 };
 
 #endif // RESPONSE_HPP

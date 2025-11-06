@@ -7,13 +7,11 @@ ConfigParser::ConfigParser()
 
 ConfigParser::~ConfigParser() { }
 
-/* printing parametrs of servers from config file */
 int ConfigParser::print()
 {
 	return (0);
 }
 
-/* checking and read config file, split servers to strings and creating vector of servers */
 int ConfigParser::createCluster(const std::string &config_file)
 {
 	std::string		content;
@@ -42,7 +40,6 @@ int ConfigParser::createCluster(const std::string &config_file)
 	return (0);
 }
 
-/*remove comments from char # to \n */
 void ConfigParser::removeComments(std::string &content)
 {
 	size_t pos;
@@ -57,7 +54,6 @@ void ConfigParser::removeComments(std::string &content)
 	}
 }
 
-/* deleting whitespaces in the start, end and in the content if more than one */
 void ConfigParser::removeWhiteSpace(std::string &content)
 {
 	size_t	i = 0;
@@ -71,7 +67,6 @@ void ConfigParser::removeWhiteSpace(std::string &content)
 	content = content.substr(0, i + 1);
 }
 
-/* spliting servers on separetly strings in vector */
 void ConfigParser::splitServers(std::string &content)
 {
 	size_t start = 0;
@@ -91,7 +86,6 @@ void ConfigParser::splitServers(std::string &content)
 	}
 }
 
-/* finding a server begin and return the index of { start of server */
 size_t ConfigParser::findStartServer(size_t start, std::string &content)
 {
 	size_t i = start;
@@ -130,7 +124,6 @@ size_t ConfigParser::findStartServer(size_t start, std::string &content)
 	throw ErrorException("Wrong character out of server scope{}");
 }
 
-/* finding a server end and return the index of } end of server */
 size_t ConfigParser::findEndServer (size_t start, std::string &content)
 {
 	size_t	i;
@@ -151,7 +144,6 @@ size_t ConfigParser::findEndServer (size_t start, std::string &content)
 	return (start);
 }
 
-/* spliting line by separator */
 std::vector<std::string> splitParametrs(std::string line, std::string sep)
 {
 	std::vector<std::string>	str;
@@ -172,7 +164,6 @@ std::vector<std::string> splitParametrs(std::string line, std::string sep)
 	return (str);
 }
 
-/* creating Server from string and fill the value */
 void ConfigParser::createServer(std::string &config, ServerConfig &server)
 {
 	std::vector<std::string>	parametrs;
@@ -284,7 +275,6 @@ void ConfigParser::createServer(std::string &config, ServerConfig &server)
 		throw ErrorException("Incorrect path for error page or number of error");
 }
 
-/* comparing strings from position */
 int	ConfigParser::stringCompare(std::string str1, std::string str2, size_t pos)
 {
 	size_t	i;
@@ -300,7 +290,6 @@ int	ConfigParser::stringCompare(std::string str1, std::string str2, size_t pos)
 	return (1);
 }
 
-/* checking repeat and mandatory parametrs*/
 void ConfigParser::checkServers()
 {
 	std::vector<ServerConfig>::iterator it1;

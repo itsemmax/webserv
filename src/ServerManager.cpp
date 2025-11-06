@@ -3,9 +3,6 @@
 ServerManager::ServerManager(){}
 ServerManager::~ServerManager(){}
 
-/**
- * Start all servers on ports specified in the config file
- */
 void    ServerManager::setupServers(std::vector<ServerConfig> servers)
 {
     std::cout << std::endl;
@@ -31,18 +28,6 @@ void    ServerManager::setupServers(std::vector<ServerConfig> servers)
     }
 }
 
-/**
- * Runs main loop that goes through all file descriptors from 0 till the biggest fd in the set.
- * - check file descriptors returend from select():
- *      if server fd --> accept new client
- *      if client fd in read_set --> read message from client
- *      if client fd in write_set:
- *          1- If it's a CGI response and Body still not sent to CGI child process --> Send request body to CGI child process.
- *          2- If it's a CGI response and Body was sent to CGI child process --> Read outupt from CGI child process.
- *          3- If it's a normal response --> Send response to client.
- * - servers and clients sockets will be added to _recv_set_pool initially,
- *   after that, when a request is fully parsed, socket will be moved to _write_set_pool
- */
 void    ServerManager::runServers()
 {
     fd_set  recv_set_cpy;
@@ -86,7 +71,6 @@ void    ServerManager::runServers()
     }
 }
 
-/* Checks time passed for clients since last message, If more than CONNECTION_TIMEOUT, close connection */
 void    ServerManager::checkTimeout()
 {
     for(std::map<int, Client>::iterator it = _clients_map.begin() ; it != _clients_map.end(); ++it)
@@ -100,16 +84,13 @@ void    ServerManager::checkTimeout()
     }
 }
 
-/* initialize recv+write fd_sets and add all server listening sockets to _recv_fd_pool. */
 void    ServerManager::initializeSets()
 {
     FD_ZERO(&_recv_fd_pool);
     FD_ZERO(&_write_fd_pool);
 
-    // adds servers sockets to _recv_fd_pool set
     for(std::vector<ServerConfig>::iterator it = _servers.begin(); it != _servers.end(); ++it)
     {
-        //Now it calles listen() twice on even if two servers have the same host:port
         if (listen(it->getFd(), 512) == -1)
         {
             Logger::logMsg(RED, CONSOLE_OUTPUT, "webserv: listen error: %s   Closing....", strerror(errno));
@@ -123,15 +104,9 @@ void    ServerManager::initializeSets()
         addToSet(it->getFd(), _recv_fd_pool);
         _servers_map.insert(std::make_pair(it->getFd(), *it));
     }
-    // at this stage _biggest_fd will belong to the last server created.
     _biggest_fd = _servers.back().getFd();
 }
 
-/**
- * Accept new incomming connection.
- * Create new Client object and add it to _client_map
- * Add client socket to _recv_fd_pool
-*/
 void    ServerManager::acceptNewConnection(ServerConfig &serv)
 {
     struct sockaddr_in client_address;
@@ -163,8 +138,6 @@ void    ServerManager::acceptNewConnection(ServerConfig &serv)
     _clients_map.insert(std::make_pair(client_sock, new_client));
 }
 
-
-/* Closes connection from fd i and remove associated client object from _clients_map */
 void    ServerManager::closeConnection(const int i)
 {
     if (FD_ISSET(i, &_write_fd_pool))
@@ -175,11 +148,6 @@ void    ServerManager::closeConnection(const int i)
     _clients_map.erase(i);
 }
 
-/**
- * Build the response and send it to client.
- * If no error was found in request and Connection header value is keep-alive,
- * connection is kept, otherwise connection will be closed.
- */
 void    ServerManager::sendResponse(const int &i, Client &c)
 {
     int bytes_sent;
@@ -196,7 +164,6 @@ void    ServerManager::sendResponse(const int &i, Client &c)
     }
     else if (bytes_sent == 0 || (size_t) bytes_sent == response.length())
     {
-        // Logger::logMsg(LIGHTMAGENTA, CONSOLE_OUTPUT, "sendResponse() Done sending ");
         Logger::logMsg(CYAN, CONSOLE_OUTPUT, "Response Sent To Socket %d, Stats=<%d>"
         , i, c.response.getCode());
         if (c.request.keepAlive() == false || c.request.errorCode() || c.response.getCgiState())
@@ -218,7 +185,6 @@ void    ServerManager::sendResponse(const int &i, Client &c)
     }
 }
 
-/* Assigen server_block configuration to a client based on Host Header in request and server_name*/
 void    ServerManager::assignServer(Client &c)
 {
     for (std::vector<ServerConfig>::iterator it = _servers.begin();
@@ -234,12 +200,6 @@ void    ServerManager::assignServer(Client &c)
     }
 }
 
-/**
- * - Reads data from client and feed it to the parser.
- * Once parser is done or an error was found in the request,
- * socket will be moved from _recv_fd_pool to _write_fd_pool
- * and response will be sent on the next iteration of select().
- */
 void    ServerManager::readRequest(const int &i, Client &c)
 {
     char    buffer[MESSAGE_BUFFER];
@@ -294,7 +254,6 @@ void    ServerManager::handleReqBody(Client &c)
 		}
 }
 
-/* Send request body to CGI script */
 void    ServerManager::sendCgiBody(Client &c, CgiHandler &cgi)
 {
     int bytes_sent;
@@ -328,7 +287,6 @@ void    ServerManager::sendCgiBody(Client &c, CgiHandler &cgi)
     }
 }
 
-/* Reads outpud produced by the CGI script */
 void    ServerManager::readCgiResponse(Client &c, CgiHandler &cgi)
 {
     char    buffer[MESSAGE_BUFFER * 2];

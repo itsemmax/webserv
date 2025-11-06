@@ -209,4 +209,3 @@ int buildHtmlIndex(std::string &dir_name, std::vector<uint8_t> &body, size_t &bo
     return (0);
 }
 
-

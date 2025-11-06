@@ -15,8 +15,6 @@
 #define LIGHTMAGENTA   "\x1B[95m"
 #define GST             4;
 
-
-/* Not used currently */
 enum LogPrio{
     DEBUG,
     INFO,
@@ -27,7 +25,6 @@ enum L_State{
     ON,
     OFF
 };
-
 
 enum Mode{
     CONSOLE_OUTPUT,
@@ -53,6 +50,5 @@ class Logger{
         static std::map<LogPrio, std::string> initMap();
 
 };
-
 
 #endif

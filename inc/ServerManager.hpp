@@ -5,12 +5,6 @@
 #include "Client.hpp"
 #include "Response.hpp"
 
-/**
- * ServerManager
- * * operates the webserver and is responsible for
- * - runing servers with configration extracted from config file
- * - establishing new connections with clients and receive/send requests/responses.
- */
 class ServerManager
 {
     public:                 
@@ -40,6 +34,5 @@ class ServerManager
         void addToSet(const int , fd_set &);
         void removeFromSet(const int , fd_set &);
 };
-
 
 #endif // SERVERMANAGER_HPP

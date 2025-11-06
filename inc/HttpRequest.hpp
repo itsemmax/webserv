@@ -52,12 +52,6 @@ enum ParsingState
     Parsing_Done
 };
 
-/**
- *
- * - HttpRequest Class will be used to parase and store the request.
-   It gets feeded with the request and will triiger a flag when parasing is finished.
-   - If any error was found in the request, _code will be set to the correct error code.
-**/
 class HttpRequest
 {
     public:
@@ -110,7 +104,6 @@ class HttpRequest
         u_int8_t                            _ver_minor;
         std::string                         _server_name;
         std::string                         _body_str;
-        /* flags */
         bool                                _fields_done_flag;
         bool                                _body_flag;
         bool                                _body_done_flag;

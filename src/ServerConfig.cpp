@@ -14,8 +14,6 @@ ServerConfig::ServerConfig()
 }
 
 ServerConfig::~ServerConfig() { }
-
-/* copy constructor */
 ServerConfig::ServerConfig(const ServerConfig &other)
 {
 	if (this != &other)
@@ -31,12 +29,10 @@ ServerConfig::ServerConfig(const ServerConfig &other)
 		this->_listen_fd = other._listen_fd;
 		this->_autoindex = other._autoindex;
 		this->_server_address = other._server_address;
-
 	}
 	return ;
 }
 
-/* assinment operator */
 ServerConfig &ServerConfig::operator=(const ServerConfig & rhs)
 {
 	if (this != &rhs)
@@ -56,7 +52,6 @@ ServerConfig &ServerConfig::operator=(const ServerConfig & rhs)
 	return (*this);
 }
 
-/* init error page by default */
 void ServerConfig::initErrorPages(void)
 {
 	_error_pages[301] = "";
@@ -76,7 +71,6 @@ void ServerConfig::initErrorPages(void)
 	_error_pages[505] = "";
 }
 
-/* Set functions */
 void ServerConfig::setServerName(std::string server_name)
 {
 	checkToken(server_name);
@@ -158,8 +152,6 @@ void ServerConfig::setAutoindex(std::string autoindex)
 		this->_autoindex = true;
 }
 
-/* checks if there is such a default error code. If there is, it overwrites the path to the file,
-otherwise it creates a new pair: error code - path to the file */
 void ServerConfig::setErrorPages(std::vector<std::string> &parametr)
 {
 	if (parametr.empty())
@@ -195,7 +187,6 @@ void ServerConfig::setErrorPages(std::vector<std::string> &parametr)
 	}
 }
 
-/* parsing and set locations */
 void ServerConfig::setLocation(std::string path, std::vector<std::string> parametr)
 {
 	Location new_location;
@@ -350,7 +341,6 @@ void	ServerConfig::setFd(int fd)
 	this->_listen_fd = fd;
 }
 
-/* validation of parametrs */
 bool ServerConfig::isValidHost(std::string host) const
 {
 	struct sockaddr_in sockaddr;
@@ -370,14 +360,12 @@ bool ServerConfig::isValidErrorPages()
 	return (true);
 }
 
-/* check parametrs of location */
 int ServerConfig::isValidLocation(Location &location) const
 {
 	if (location.getPath() == "/cgi-bin")
 	{
 		if (location.getCgiPath().empty() || location.getCgiExtension().empty() || location.getIndexLocation().empty())
 			return (1);
-
 
 		if (ConfigFile::checkFile(location.getIndexLocation(), 4) < 0)
 		{
@@ -446,7 +434,6 @@ int ServerConfig::isValidLocation(Location &location) const
 	return (0);
 }
 
-/* Get functions */
 const std::string &ServerConfig::getServerName()
 {
 	return (this->_server_name);
@@ -497,7 +484,6 @@ int   	ServerConfig::getFd()
 	return (this->_listen_fd); 
 }
 
-/* the two functions below can be used later for response */
 const std::string &ServerConfig::getPathErrorPage(short key)
 {
 	std::map<short, std::string>::iterator it = this->_error_pages.find(key);
@@ -506,7 +492,6 @@ const std::string &ServerConfig::getPathErrorPage(short key)
 	return (it->second);
 }
 
-/* find location by a name */ //do not using in parser, created for server manager
 const std::vector<Location>::iterator ServerConfig::getLocationKey(std::string key)
 {
 	std::vector<Location>::iterator it;
@@ -518,7 +503,6 @@ const std::vector<Location>::iterator ServerConfig::getLocationKey(std::string k
 	throw ErrorException("Error: path to location not found");
 }
 
-/* check is a properly end of parametr */
 void ServerConfig::checkToken(std::string &parametr)
 {
 	size_t pos = parametr.rfind(';');
@@ -527,7 +511,6 @@ void ServerConfig::checkToken(std::string &parametr)
 	parametr.erase(pos);
 }
 
-/* check location for a dublicate */
 bool ServerConfig::checkLocaitons() const
 {
 	if (this->_locations.size() < 2)
@@ -543,7 +526,6 @@ bool ServerConfig::checkLocaitons() const
 	return (false);
 }
 
-/* socket setup and binding */
 void	ServerConfig::setupServer(void)
 {
 	if ((_listen_fd = socket(AF_INET, SOCK_STREAM, 0) )  == -1 )
