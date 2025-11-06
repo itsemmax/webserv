@@ -104,22 +104,6 @@
                             });
                             html += '</ul>';
                         }
-                        
-                        // Test files section
-                        if (testFiles.length > 0) {
-                            html += '<h3>Test Files</h3>';
-                            html += '<ul class="file-list">';
-                            testFiles.forEach(file => {
-                                html += `
-                                    <li class="file-item">
-                                        <span>${file.name} (${file.size} bytes)</span>
-                                        <button class="delete-btn" onclick="deleteFile('${file.name}', 'test')">Delete</button>
-                                    </li>
-                                `;
-                            });
-                            html += '</ul>';
-                        }
-                        
                         container.innerHTML = html;
                     } else {
                         container.innerHTML = '<p>No files available for deletion.</p>';

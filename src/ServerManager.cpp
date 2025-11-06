@@ -191,7 +191,7 @@ void    ServerManager::sendResponse(const int &i, Client &c)
 
     if (bytes_sent < 0)
     {
-        Logger::logMsg(RED, CONSOLE_OUTPUT, "sendResponse(): error sending : %s", strerror(errno));
+        Logger::logMsg(RED, CONSOLE_OUTPUT, "sendResponse(): error sending response");
         closeConnection(i);
     }
     else if (bytes_sent == 0 || (size_t) bytes_sent == response.length())
@@ -253,7 +253,7 @@ void    ServerManager::readRequest(const int &i, Client &c)
     }
     else if (bytes_read < 0)
     {
-        Logger::logMsg(RED, CONSOLE_OUTPUT, "webserv: fd %d read error %s", i, strerror(errno));
+        Logger::logMsg(RED, CONSOLE_OUTPUT, "webserv: fd %d read error", i);
         closeConnection(i);
         return ;
     }
@@ -286,7 +286,7 @@ void    ServerManager::handleReqBody(Client &c)
     	if (c.request.getBody().length() == 0)
 		{
 			std::string tmp;
-			std::fstream file;(c.response._cgi_obj.getCgiPath().c_str());
+			std::fstream file(c.response._cgi_obj.getCgiPath().c_str());
 			std::stringstream ss;
 			ss << file.rdbuf();
 			tmp = ss.str();
@@ -309,7 +309,7 @@ void    ServerManager::sendCgiBody(Client &c, CgiHandler &cgi)
 
     if (bytes_sent < 0)
     {
-        Logger::logMsg(RED, CONSOLE_OUTPUT, "sendCgiBody() Error Sending: %s", strerror(errno));
+        Logger::logMsg(RED, CONSOLE_OUTPUT, "sendCgiBody() Error Sending");
         removeFromSet(cgi.pipe_in[1], _write_fd_pool);
         close(cgi.pipe_in[1]);
         close(cgi.pipe_out[1]);
@@ -353,7 +353,7 @@ void    ServerManager::readCgiResponse(Client &c, CgiHandler &cgi)
     }
     else if (bytes_read < 0)
     {
-        Logger::logMsg(RED, CONSOLE_OUTPUT, "readCgiResponse() Error Reading From CGI Script: ", strerror(errno));
+        Logger::logMsg(RED, CONSOLE_OUTPUT, "readCgiResponse() Error Reading From CGI Script");
         removeFromSet(cgi.pipe_out[0], _recv_fd_pool);
         close(cgi.pipe_in[0]);
         close(cgi.pipe_out[0]);

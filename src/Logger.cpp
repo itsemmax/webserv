@@ -37,7 +37,6 @@ void    Logger::logMsg(const char *color, Mode m, const char* msg, ...)
                 return ;
             }
             int fd = open(("logs/" + file_name).c_str(), O_CREAT | O_APPEND | O_WRONLY, S_IRUSR | S_IWUSR);
-            std::cout << "fd is " << fd << "And errno is :" << strerror(errno) << std::endl;
             write(fd, date.c_str(), date.length());
             write(fd, "   ", 3);
             write(fd, output, n);
@@ -48,11 +47,8 @@ void    Logger::logMsg(const char *color, Mode m, const char* msg, ...)
         {
             // Not used Currently..
             // if (p == DEBUG)
-            //     std::cout << LIGHTMAGENTA;
             // else if (p == INFO)
-            //     std::cout << CYAN;
             // else if (p == ERROR)
-            //     std::cout << RED;
             std::cout << color << getCurrTime() << output << RESET << std::endl;
         }      
         va_end(args);

@@ -163,7 +163,6 @@ static bool    checkReturn(Location &loc, short &code, std::string &location)
 
 static std::string combinePaths(std::string p1, std::string p2, std::string p3)
 {
-    std::cout << "DEBUG: combinePaths input: p1='" << p1 << "', p2='" << p2 << "', p3='" << p3 << "'" << std::endl;
     
     std::string res;
     int         len1;
@@ -189,7 +188,6 @@ static std::string combinePaths(std::string p1, std::string p2, std::string p3)
         p2.insert(p2.end(), '/');
         
     res = p1 + p2 + p3;
-    std::cout << "DEBUG: combinePaths result: '" << res << "'" << std::endl;
     return (res);
 }
 
@@ -238,7 +236,6 @@ static void appendRoot(Location &location, HttpRequest &request, std::string &ta
         target_file = rootPath + "/" + path;
     }
     
-    std::cout << "DEBUG: Final target file path: " << target_file << std::endl;
 }
 
 int Response::handleCgiTemp(std::string &location_key)
@@ -267,31 +264,26 @@ int Response::handleCgi(std::string &location_key)
 
     // Use the target file that was set in handleTarget
     path = _target_file;
-    std::cout << "DEBUG: CGI processing path: " << path << std::endl;
 
     // Handle default index for /cgi-bin/
     if (path == "cgi-bin" || path == "cgi-bin/")
     {
         path = "cgi-bin/" + _server.getLocationKey(location_key)->getIndexLocation();
-        std::cout << "DEBUG: Using default CGI index: " << path << std::endl;
     }
 
     // Check file extension
     pos = path.find(".");
     if (pos == std::string::npos)
     {
-        std::cout << "DEBUG: No file extension found in CGI path" << std::endl;
         _code = 501;
         return (1);
     }
 
     exten = path.substr(pos);
-    std::cout << "DEBUG: CGI file extension: " << exten << std::endl;
 
     // Verify extension is supported
     if (exten != ".py" && exten != ".sh")
     {
-        std::cout << "DEBUG: Unsupported CGI extension: " << exten << std::endl;
         _code = 501;
         return (1);
     }
@@ -300,7 +292,6 @@ int Response::handleCgi(std::string &location_key)
     struct stat st;
     if (stat(path.c_str(), &st) != 0)
     {
-        std::cout << "DEBUG: CGI file not found: " << path << std::endl;
         _code = 404;
         return (1);
     }
@@ -308,7 +299,6 @@ int Response::handleCgi(std::string &location_key)
     // Check if file is executable
     if (!(st.st_mode & S_IXUSR))
     {
-        std::cout << "DEBUG: CGI file not executable: " << path << std::endl;
         _code = 403;
         return (1);
     }
@@ -316,7 +306,6 @@ int Response::handleCgi(std::string &location_key)
     // Check if method is allowed
     if (isAllowedMethod(request.getMethod(), *_server.getLocationKey(location_key), _code))
     {
-        std::cout << "DEBUG: Method not allowed for CGI" << std::endl;
         return (1);
     }
 
@@ -328,7 +317,6 @@ int Response::handleCgi(std::string &location_key)
     // Create pipe for CGI communication
     if (pipe(_cgi_fd) < 0)
     {
-        std::cout << "DEBUG: Failed to create pipe for CGI" << std::endl;
         _code = 500;
         return (1);
     }
@@ -364,14 +352,10 @@ static void    getLocationMatch(std::string &path, std::vector<Location> locatio
 int    Response::handleTarget()
 {
     std::string location_key;
-    std::cout << "DEBUG: Incoming request path: " << request.getPath() << std::endl;
-    std::cout << "DEBUG: Request method: " << request.getMethodStr() << std::endl;
     getLocationMatch(request.getPath(), _server.getLocations(), location_key);
-    std::cout << "DEBUG: Matched location key: " << location_key << std::endl;
     if (location_key.length() > 0)
     {
         Location target_location = *_server.getLocationKey(location_key);
-        std::cout << "DEBUG: Location root: " << target_location.getRootLocation() << std::endl;
 
         if (isAllowedMethod(request.getMethod(), target_location, _code))
         {
@@ -388,12 +372,10 @@ int    Response::handleTarget()
 
         if (target_location.getPath().find("cgi-bin") != std::string::npos)
         {
-            std::cout << "DEBUG: Handling CGI request for path: " << request.getPath() << std::endl;
             _target_file = request.getPath();
             if (_target_file[0] == '/') {
                 _target_file = _target_file.substr(1);  // Remove leading slash
             }
-            std::cout << "DEBUG: CGI target file: " << _target_file << std::endl;
             return (handleCgi(location_key));
         }
 
@@ -455,7 +437,6 @@ int    Response::handleTarget()
     }
     else
     {
-        std::cout << "DEBUG: No location match, using server root: " << _server.getRoot() << std::endl;
         // Handle root path specially
         if (request.getPath() == "/" || request.getPath().empty()) {
             _target_file = combinePaths(_server.getRoot(), "", "");
@@ -463,10 +444,8 @@ int    Response::handleTarget()
                 _target_file += "/";
             }
             _target_file += _server.getIndex();
-            std::cout << "DEBUG: Using index file: " << _target_file << std::endl;
             
             if (!fileExists(_target_file)) {
-                std::cout << "DEBUG: Index file not found: " << _target_file << std::endl;
                 _code = 404;
                 return (1);
             }
@@ -474,7 +453,6 @@ int    Response::handleTarget()
         }
         
         _target_file = combinePaths(_server.getRoot(), request.getPath(), "");
-        std::cout << "DEBUG: Final target file path: " << _target_file << std::endl;
         
         if (isDirectory(_target_file))
         {
@@ -523,7 +501,6 @@ void Response::buildErrorBody()
     if (!_server.getErrorPages().count(_code) || _server.getErrorPages().at(_code).empty() ||
         request.getMethod() == DELETE || request.getMethod() == POST)
     {
-        std::cout << "DEBUG: Using default error page for code " << _code << std::endl;
         setServerDefaultErrorPages();
     }
     else
@@ -537,7 +514,6 @@ void Response::buildErrorBody()
 
         // If error page doesn't exist, fall back to default
         if (!fileExists(_target_file)) {
-            std::cout << "DEBUG: Error page not found, falling back to default for code " << _code << std::endl;
             setServerDefaultErrorPages();
         }
         else
@@ -556,14 +532,12 @@ void    Response::buildResponse()
 {
     if (reqError() || buildBody())
     {
-        std::cout << "DEBUG: Building error body for code " << _code << std::endl;
         buildErrorBody();
     }
     if (_cgi)
         return;
     else if (_auto_index)
     {
-        std::cout << "DEBUG: Generating auto index for target file: " << _target_file << std::endl;
         if (buildHtmlIndex(_target_file, _body, _body_length))
         {
             _code = 500;
@@ -572,7 +546,6 @@ void    Response::buildResponse()
         else
         {
             _code = 200;
-            std::cout << "DEBUG: Auto index generated successfully." << std::endl;
         }
         _response_body.insert(_response_body.begin(), _body.begin(), _body.end());
     }
@@ -580,7 +553,6 @@ void    Response::buildResponse()
     setHeaders();
     if (request.getMethod() != HEAD && (request.getMethod() == GET || _code != 200))
     {
-        std::cout << "DEBUG: Appending response body to response content." << std::endl;
         _response_content.append(_response_body);
     }
 }
@@ -618,22 +590,17 @@ void        Response::setStatusLine()
 
 int    Response::buildBody()
 {
-    std::cout << "DEBUG: Building response body..." << std::endl;
     if (request.getBody().length() > _server.getClientMaxBodySize()) {
-        std::cout << "DEBUG: Request body too large" << std::endl;
         _code = 413;
         return (1);
     }
     if (handleTarget()) {
-        std::cout << "DEBUG: handleTarget failed with code: " << _code << std::endl;
         return (1);
     }
     if (_cgi || _auto_index) {
-        std::cout << "DEBUG: CGI or autoindex handling" << std::endl;
         return (0);
     }
     if (_code) {
-        std::cout << "DEBUG: Error code set: " << _code << std::endl;
         return (0);
     }
 
@@ -689,13 +656,11 @@ int    Response::buildBody()
 
 int Response::readFile()
 {
-    std::cout << "DEBUG: Attempting to read file: " << _target_file << std::endl;
 
     // First check if path exists
     struct stat path_stat;
     if (stat(_target_file.c_str(), &path_stat) != 0)
     {
-        std::cout << "DEBUG: File does not exist: " << _target_file << std::endl;
         _code = 404;
         return (1);
     }
@@ -703,7 +668,6 @@ int Response::readFile()
     // Check if it's a regular file
     if (!S_ISREG(path_stat.st_mode))
     {
-        std::cout << "DEBUG: Path exists but is not a regular file: " << _target_file << std::endl;
         _code = 403;
         return (1);
     }
@@ -712,7 +676,6 @@ int Response::readFile()
     std::ifstream file(_target_file.c_str(), std::ios::binary);
     if (!file.is_open())
     {
-        std::cout << "DEBUG: Failed to open file: " << _target_file << std::endl;
         _code = 403;
         return (1);
     }
@@ -725,20 +688,17 @@ int Response::readFile()
         
         if (file.fail())
         {
-            std::cout << "DEBUG: Error occurred while reading file: " << _target_file << std::endl;
             _code = 500;
             return (1);
         }
     }
     catch (const std::exception& e)
     {
-        std::cout << "DEBUG: Exception while reading file: " << e.what() << std::endl;
         _code = 500;
         return (1);
     }
 
     file.close();
-    std::cout << "DEBUG: Successfully read file: " << _target_file << " (size: " << _response_body.length() << " bytes)" << std::endl;
     return (0);
 }
 

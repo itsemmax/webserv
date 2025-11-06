@@ -72,7 +72,6 @@ void CgiHandler::setCgiPath(const std::string &path)
     if (cgi_path[0] == '/') {
         cgi_path = cgi_path.substr(1);
     }
-    std::cout << "DEBUG: Setting CGI path to: " << cgi_path << std::endl;
     this->_cgi_path = cgi_path;
 }
 
@@ -234,7 +233,6 @@ void CgiHandler::execute(short &error_code)
 	else if (this->_cgi_pid > 0){}
 	else
 	{
-        std::cout << "Fork failed" << std::endl;
 		error_code = 500;
 	}
 }
